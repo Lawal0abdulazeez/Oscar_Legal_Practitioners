@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "oscar-legal-ai"
+version = "0.1.0"
+description = "AI Service for Oscar Legal Practitioners"
+authors = ["Oscar Legal Team <team@oscarlegal.com>"]
+readme = "README.md"
+packages = [{include = "app"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.109.0"
+uvicorn = {extras = ["standard"], version = "^0.27.0"}
+openai = "^1.11.0"
+langchain = "^0.1.5"
+chromadb = "^0.4.22"
+sentence-transformers = "^2.3.1"
+pypdf2 = "^3.0.1"
+python-docx = "^1.1.0"
+python-multipart = "^0.0.9"
+httpx = "^0.26.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0.0"
+pytest-cov = "^4.1.0"
+black = "^24.1.0"
+isort = "^5.13.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
