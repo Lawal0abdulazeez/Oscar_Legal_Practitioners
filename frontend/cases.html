@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cases | Oscar Legal Practitioners</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/dashboard.css">
+</head>
+
+<body class="dashboard-body">
+    <div class="dashboard-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="logo">
+                    <span class="logo-icon"><i class="fas fa-scale-balanced"></i></span>
+                    <span class="logo-text">Oscar Legal</span>
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="dashboard.html"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+                    <li><a href="clients.html"><i class="fas fa-users"></i> Clients</a></li>
+                    <li class="active"><a href="cases.html"><i class="fas fa-briefcase"></i> Cases</a></li>
+                    <li><a href="research.html"><i class="fas fa-magnifying-glass"></i> AI Research</a></li>
+                    <li><a href="drafting.html"><i class="fas fa-file-pen"></i> AI Drafting</a></li>
+                    <li><a href="analysis.html"><i class="fas fa-brain"></i> Legal Analysis</a></li>
+                    <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="logout-btn" class="btn btn-outline"><i class="fas fa-right-from-bracket"></i>
+                    Logout</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="content-header">
+                <h1>Case Management</h1>
+                <button class="btn btn-primary" id="add-case-btn"><i class="fas fa-plus"></i> New Case</button>
+            </header>
+
+            <div class="grid-card">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Case #</th>
+                                <th>Title</th>
+                                <th>Client</th>
+                                <th>Status</th>
+                                <th>Priority</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cases-list">
+                            <tr>
+                                <td colspan="6" class="empty-state">Loading cases...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add Case Modal -->
+    <div id="case-modal"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; align-items:center; justify-content:center;">
+        <div class="auth-container" style="max-width:600px">
+            <h3>Open New Case</h3>
+            <div class="form-group">
+                <label>Client</label>
+                <select id="case-client-id" class="form-control">
+                    <option value="">Select a client...</option>
+                </select>
+            </div>
+            <div class="form-group"><label>Case Title</label><input type="text" id="case-title" class="form-control"
+                    placeholder="e.g., Smith vs Johnson"></div>
+            <div class="form-group"><label>Case Number</label><input type="text" id="case-number" class="form-control"
+                    placeholder="C-2026-001"></div>
+            <div class="form-group">
+                <label>Priority</label>
+                <select id="case-priority" class="form-control">
+                    <option value="low">Low</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="high">High</option>
+                </select>
+            </div>
+            <div style="display:flex; gap:10px; margin-top:20px">
+                <button class="btn btn-primary" id="save-case">Open Case</button>
+                <button class="btn btn-secondary"
+                    onclick="document.getElementById('case-modal').style.display='none'">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/js/common.js"></script>
+    <script>
+        const token = localStorage.getItem('access_token');
+
+        async function loadClientsForSelect() {
+            try {
+                const response = await fetch('/api/v1/clients/', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    const clients = await response.json();
+                    const select = document.getElementById('case-client-id');
+                    select.innerHTML += clients.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+                }
+            } catch (err) { }
+        }
+
+        async function loadCases() {
+            try {
+                const response = await fetch('/api/v1/cases/', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    const cases = await response.json();
+                    const list = document.getElementById('cases-list');
+                    if (cases.length === 0) {
+                        list.innerHTML = '<tr><td colspan="6" class="empty-state">No cases found. Click "New Case" to begin.</td></tr>';
+                    } else {
+                        list.innerHTML = cases.map(c => `
+                            <tr>
+                                <td><code>${c.case_number}</code></td>
+                                <td style="font-weight:600">${c.title}</td>
+                                <td>Client #${c.client_id}</td>
+                                <td><span class="case-badge badge-med">${c.status}</span></td>
+                                <td><span class="case-badge badge-${c.priority === 'high' ? 'high' : 'med'}">${c.priority}</span></td>
+                                <td><button class="link-btn">Manage</button></td>
+                            </tr>
+                        `).join('');
+                    }
+                }
+            } catch (err) { console.error(err); }
+        }
+
+        document.getElementById('add-case-btn').onclick = () => {
+            document.getElementById('case-modal').style.display = 'flex';
+        };
+
+        document.getElementById('save-case').onclick = async () => {
+            const data = {
+                client_id: parseInt(document.getElementById('case-client-id').value),
+                title: document.getElementById('case-title').value,
+                case_number: document.getElementById('case-number').value,
+                priority: document.getElementById('case-priority').value,
+                status: "open"
+            };
+
+            if (!data.client_id || !data.title || !data.case_number) {
+                alert('Please fill all required fields.');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/v1/cases/', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                if (response.ok) {
+                    document.getElementById('case-modal').style.display = 'none';
+                    loadCases();
+                } else {
+                    alert('Error opening case. Case number might be duplicate.');
+                }
+            } catch (err) { console.error(err); }
+        };
+
+        loadClientsForSelect();
+        loadCases();
+
+        // Logout
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            localStorage.clear();
+            window.location.href = 'signin.html';
+        });
+    </script>
+</body>
+
+</html>

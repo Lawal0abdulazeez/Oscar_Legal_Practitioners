@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Research Assistant | Oscar Legal Practitioners</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/dashboard.css">
+    <style>
+        .research-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .search-area {
+            background: white;
+            padding: 30px;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 30px;
+            border: 1px solid var(--border);
+        }
+
+        .search-input-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .search-input-group input {
+            flex: 1;
+            padding: 14px 20px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            font-size: 1.1rem;
+        }
+
+        .results-area {
+            display: none;
+            /* Shown when results arrive */
+        }
+
+        .result-card {
+            background: white;
+            padding: 40px;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            line-height: 1.8;
+        }
+
+        .result-card h2 {
+            margin-bottom: 24px;
+            color: var(--accent);
+        }
+
+        .source-list {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .source-tag {
+            display: inline-block;
+            background: var(--surface);
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+    </style>
+</head>
+
+<body class="dashboard-body">
+    <div class="dashboard-wrapper">
+        <!-- Sidebar same as dashboard -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="logo">
+                    <span class="logo-icon"><i class="fas fa-scale-balanced"></i></span>
+                    <span class="logo-text">Oscar Legal</span>
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="dashboard.html"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+                    <li><a href="clients.html"><i class="fas fa-users"></i> Clients</a></li>
+                    <li><a href="cases.html"><i class="fas fa-briefcase"></i> Cases</a></li>
+                    <li class="active"><a href="research.html"><i class="fas fa-magnifying-glass"></i> AI Research</a>
+                    </li>
+                    <li><a href="drafting.html"><i class="fas fa-file-pen"></i> AI Drafting</a></li>
+                    <li><a href="analysis.html"><i class="fas fa-brain"></i> Legal Analysis</a></li>
+                    <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="logout-btn" class="btn btn-outline"><i class="fas fa-right-from-bracket"></i>
+                    Logout</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="content-header">
+                <div class="welcome-text">
+                    <h1>AI Research Assistant</h1>
+                    <p>Semantic legal research across jurisdictions.</p>
+                </div>
+            </header>
+
+            <div class="research-container">
+                <div class="search-area">
+                    <div class="search-input-group">
+                        <input type="text" id="research-query"
+                            placeholder="Ask a legal question (e.g., Burden of proof in libel cases...)">
+                        <button id="run-research" class="btn btn-primary btn-large">Research <i
+                                class="fas fa-microchip"></i></button>
+                    </div>
+                    <div style="margin-top: 15px; display:flex; gap: 20px;">
+                        <select id="jurisdiction" class="form-control" style="width: 200px;">
+                            <option value="">All Jurisdictions</option>
+                            <option value="nigeria">Nigeria</option>
+                            <option value="uk">United Kingdom</option>
+                            <option value="us">United States</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="loading" class="loading-spinner">
+                    <i class="fas fa-circle-notch fa-spin fa-3x" style="color: var(--accent);"></i>
+                    <p style="margin-top: 15px;">Analyzing legal precedents... This may take a moment.</p>
+                </div>
+
+                <div id="results" class="results-area">
+                    <div class="result-card">
+                        <h2>Research Summary</h2>
+                        <div id="answer-content"></div>
+
+                        <div class="source-list">
+                            <h4>Retrieved Sources</h4>
+                            <div id="sources-container"></div>
+                        </div>
+
+                        <div style="margin-top:30px; display:flex; gap:12px;">
+                            <button class="btn btn-secondary"><i class="fas fa-file-pdf"></i> Export PDF</button>
+                            <button class="btn btn-secondary"><i class="fas fa-bookmark"></i> Save to Case</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="assets/js/common.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const runBtn = document.getElementById('run-research');
+            const queryInput = document.getElementById('research-query');
+            const resultsArea = document.getElementById('results');
+            const loading = document.getElementById('loading');
+            const answerContent = document.getElementById('answer-content');
+            const sourcesContainer = document.getElementById('sources-container');
+
+            // Handle URL params
+            const urlParams = new URLSearchParams(window.location.search);
+            const initialQuery = urlParams.get('query');
+            if (initialQuery) {
+                queryInput.value = initialQuery;
+                performResearch();
+            }
+
+            async function performResearch() {
+                const query = queryInput.value.trim();
+                const jurisdiction = document.getElementById('jurisdiction').value;
+                const token = localStorage.getItem('access_token');
+
+                if (!query) return;
+
+                resultsArea.style.display = 'none';
+                loading.style.display = 'block';
+
+                try {
+                    const response = await fetch('/api/v1/research', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ query, jurisdiction })
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        answerContent.innerHTML = data.answer.replace(/\n/g, '<br>');
+
+                        sourcesContainer.innerHTML = data.sources.length > 0
+                            ? data.sources.map(s => `<span class="source-tag"><i class="fas fa-book"></i> ${s.title || 'Legal Document'}</span>`).join('')
+                            : '<p class="text-muted">No external sources cited.</p>';
+
+                        resultsArea.style.display = 'block';
+                    } else {
+                        alert('Could not complete research. Please check your connection to the AI service.');
+                    }
+                } catch (err) {
+                    console.error('Research error:', err);
+                } finally {
+                    loading.style.display = 'none';
+                }
+            }
+
+            runBtn.addEventListener('click', performResearch);
+            queryInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') performResearch(); });
+
+            // Logout
+            document.getElementById('logout-btn').addEventListener('click', () => {
+                localStorage.clear();
+                window.location.href = 'signin.html';
+            });
+        });
+    </script>
+</body>
+
+</html>

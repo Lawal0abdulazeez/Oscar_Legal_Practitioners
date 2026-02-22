@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lawyer Dashboard | Oscar Legal Practitioners</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/dashboard.css">
+</head>
+
+<body class="dashboard-body">
+    <div class="dashboard-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="logo">
+                    <span class="logo-icon"><i class="fas fa-scale-balanced"></i></span>
+                    <span class="logo-text">Oscar Legal</span>
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="active"><a href="dashboard.html"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+                    <li><a href="clients.html"><i class="fas fa-users"></i> Clients</a></li>
+                    <li><a href="cases.html"><i class="fas fa-briefcase"></i> Cases</a></li>
+                    <li><a href="research.html"><i class="fas fa-magnifying-glass"></i> AI Research</a></li>
+                    <li><a href="drafting.html"><i class="fas fa-file-pen"></i> AI Drafting</a></li>
+                    <li><a href="analysis.html"><i class="fas fa-brain"></i> Legal Analysis</a></li>
+                    <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="logout-btn" class="btn btn-outline"><i class="fas fa-right-from-bracket"></i>
+                    Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <div class="welcome-text">
+                    <h1 id="user-welcome">Hello, Counselor</h1>
+                    <p>Here is what's happening today.</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-outline" id="publish-insight-btn"><i class="fas fa-bullhorn"></i> Publish
+                        Insight</button>
+                    <button class="btn btn-primary" onclick="window.location.href='cases.html'"><i
+                            class="fas fa-plus"></i> New Case</button>
+                    <div class="user-profile">
+                        <img src="https://ui-avatars.com/api/?name=Lawyer&background=2563eb&color=fff" alt="Profile"
+                            id="user-avatar">
+                    </div>
+                </div>
+            </header>
+
+            <!-- Blog Modal -->
+            <div id="blog-modal"
+                style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; align-items:center; justify-content:center;">
+                <div class="auth-container" style="max-width:700px; padding: 40px;">
+                    <h3>Publish Legal Insight</h3>
+                    <p class="text-muted">Broadcast your expertise to the public blog.</p>
+                    <div class="form-group" style="margin-top:20px">
+                        <label>Title</label>
+                        <input type="text" id="blog-title" class="form-control"
+                            placeholder="The impact of new digital laws...">
+                    </div>
+                    <div class="form-group">
+                        <label>Short Description (Excerpt)</label>
+                        <input type="text" id="blog-excerpt" class="form-control" placeholder="A brief summary...">
+                    </div>
+                    <div class="form-group">
+                        <label>Full Content (Markdown supported)</label>
+                        <textarea id="blog-content" class="form-control" rows="8"
+                            placeholder="Write your full legal analysis here..."></textarea>
+                    </div>
+                    <div style="display:flex; gap:10px; margin-top:20px">
+                        <button class="btn btn-primary" id="save-blog">Publish Now</button>
+                        <button class="btn btn-secondary"
+                            onclick="document.getElementById('blog-modal').style.display='none'">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon icon-blue"><i class="fas fa-folder-open"></i></div>
+                    <div class="stat-data">
+                        <span class="stat-label">Active Cases</span>
+                        <span class="stat-value" id="count-cases">0</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon icon-green"><i class="fas fa-user-check"></i></div>
+                    <div class="stat-data">
+                        <span class="stat-label">Total Clients</span>
+                        <span class="stat-value" id="count-clients">0</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon icon-purple"><i class="fas fa-clock"></i></div>
+                    <div class="stat-data">
+                        <span class="stat-label">Pending Tasks</span>
+                        <span class="stat-value" id="count-tasks">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Content -->
+            <div class="dashboard-grid">
+                <!-- Recent Cases Table -->
+                <div class="grid-card recent-cases">
+                    <div class="card-header">
+                        <h3>Recent Cases</h3>
+                        <a href="cases.html" class="link-btn">View All</a>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Client</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent-cases-list">
+                                <!-- Data populated by JS -->
+                                <tr>
+                                    <td colspan="4" class="empty-state">No cases found</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- AI Quick Tool -->
+                <div class="grid-card ai-quick-tool">
+                    <div class="card-header">
+                        <h3>AI Research Assistant</h3>
+                    </div>
+                    <div class="ai-chat-preview">
+                        <p class="ai-hint">Ask a legal research question to get started...</p>
+                        <div class="chat-input-box">
+                            <input type="text" id="ai-quick-query" placeholder="e.g., Tenant rights in Lagos...">
+                            <button id="ai-quick-send"><i class="fas fa-paper-plane"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="assets/js/common.js"></script>
+    <script src="assets/js/dashboard.js"></script>
+</body>
+
+</html>

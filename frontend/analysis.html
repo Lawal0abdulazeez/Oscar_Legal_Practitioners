@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legal Analysis | Oscar Legal Practitioners</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/dashboard.css">
+</head>
+
+<body class="dashboard-body">
+    <div class="dashboard-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="logo">
+                    <span class="logo-icon"><i class="fas fa-scale-balanced"></i></span>
+                    <span class="logo-text">Oscar Legal</span>
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="dashboard.html"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+                    <li><a href="clients.html"><i class="fas fa-users"></i> Clients</a></li>
+                    <li><a href="cases.html"><i class="fas fa-briefcase"></i> Cases</a></li>
+                    <li><a href="research.html"><i class="fas fa-magnifying-glass"></i> AI Research</a></li>
+                    <li><a href="drafting.html"><i class="fas fa-file-pen"></i> AI Drafting</a></li>
+                    <li class="active"><a href="analysis.html"><i class="fas fa-brain"></i> Legal Analysis</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="logout-btn" class="btn btn-outline"><i class="fas fa-right-from-bracket"></i>
+                    Logout</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="content-header">
+                <h1>AI Legal Analysis</h1>
+                <p>Deep investigative analysis of complex legal situations.</p>
+            </header>
+
+            <div class="research-container">
+                <div class="search-area">
+                    <div class="form-group">
+                        <label>State the Legal Issue / Scenario</label>
+                        <textarea id="analysis-issue" class="form-control" rows="5"
+                            placeholder="Describe the situation in detail..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Additional Context (Optional)</label>
+                        <input type="text" id="analysis-context" class="form-control"
+                            placeholder="Specific laws, parties involved, etc.">
+                    </div>
+                    <button id="run-analysis" class="btn btn-primary btn-large">Perform Deep Analysis <i
+                            class="fas fa-microchip"></i></button>
+                </div>
+
+                <div id="loading" class="loading-spinner" style="display:none; text-align:center; padding:40px;">
+                    <i class="fas fa-brain fa-spin fa-3x" style="color:var(--accent)"></i>
+                    <p style="margin-top:15px">Synthesizing legal principles and identifying risks...</p>
+                </div>
+
+                <div id="results" class="results-area">
+                    <div class="result-card">
+                        <h2>Analytical Report</h2>
+                        <div id="analysis-content" style="white-space: pre-wrap; line-height: 1.8;"></div>
+
+                        <div style="margin-top:30px; display:flex; gap:12px;">
+                            <button class="btn btn-secondary"><i class="fas fa-print"></i> Print Report</button>
+                            <button class="btn btn-primary"><i class="fas fa-save"></i> Save to Case File</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="assets/js/common.js"></script>
+    <script>
+        document.getElementById('run-analysis').addEventListener('click', async () => {
+            const btn = document.getElementById('run-analysis');
+            const loading = document.getElementById('loading');
+            const results = document.getElementById('results');
+            const content = document.getElementById('analysis-content');
+            const token = localStorage.getItem('access_token');
+
+            const payload = {
+                issue: document.getElementById('analysis-issue').value,
+                context: document.getElementById('analysis-context').value
+            };
+
+            if (!payload.issue) {
+                alert('Please describe the legal issue.');
+                return;
+            }
+
+            loading.style.display = 'block';
+            results.style.display = 'none';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch('/api/v1/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    content.innerText = data.analysis;
+                    results.style.display = 'block';
+                } else {
+                    alert('Analysis failed. Ensure AI service is online.');
+                }
+            } catch (err) {
+                console.error(err);
+            } finally {
+                loading.style.display = 'none';
+                btn.disabled = false;
+            }
+        });
+
+        // Logout
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            localStorage.clear();
+            window.location.href = 'signin.html';
+        });
+    </script>
+</body>
+
+</html>

@@ -34,6 +34,12 @@ If you're new to this project, follow this path:
    - Troubleshooting
    - **Reading time**: 5 minutes
 
+5. **[TESTING_GUIDE.md](./TESTING_GUIDE.md)** ⭐ **TESTING**
+   - Functional test scenarios
+   - Seeded credentials
+   - Troubleshooting logs
+   - **Reading time**: 5 minutes
+
 ---
 
 ## 📖 Core Documentation

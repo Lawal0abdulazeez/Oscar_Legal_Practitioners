@@ -3,7 +3,7 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from app.core.config import settings
 from app.core.database import Base
-from app.models.user import User # Import models so Base.metadata knows
+from app import models # Import models so Base.metadata knows
 
 from alembic import context
 

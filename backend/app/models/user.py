@@ -19,4 +19,8 @@ class User(Base):
     role = Column(Enum(UserRole), default=UserRole.CLIENT, nullable=False)
     is_active = Column(Boolean, default=True)
 
-    # Relationships can be added later (e.g., Profile, Cases)
+    # Relationships
+    clients = relationship("Client", back_populates="lawyer")
+    cases = relationship("Case", back_populates="lawyer")
+    tasks = relationship("Task", back_populates="assignee")
+    blog_posts = relationship("BlogPost", back_populates="author")

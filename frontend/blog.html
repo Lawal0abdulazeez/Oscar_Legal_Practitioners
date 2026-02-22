@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legal Blog | Oscar Legal Practitioners</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/main.css">
+    <style>
+        .blog-hero {
+            padding: 80px 0;
+            background: var(--primary);
+            color: white;
+            text-align: center;
+        }
+
+        .blog-grid {
+            padding: 80px 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 40px;
+        }
+
+        .blog-card {
+            background: white;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            border: 1px solid var(--border);
+            transition: var(--transition);
+        }
+
+        .blog-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .blog-img {
+            height: 200px;
+            background: var(--surface);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: var(--accent);
+        }
+
+        .blog-content {
+            padding: 24px;
+        }
+
+        .blog-content .meta {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .blog-content h3 {
+            margin-bottom: 16px;
+            line-height: 1.3;
+        }
+
+        .blog-content p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <span class="logo-icon"><i class="fas fa-scale-balanced"></i></span>
+                <span class="logo-text">Oscar Legal</span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="blog.html" style="color:var(--accent)">Blog</a>
+                <a href="signin.html" class="btn btn-outline">Sign In</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="blog-hero">
+        <div class="container">
+            <h1 class="section-title">Legal Insights & <span class="gradient-text">Analysis</span></h1>
+            <p>Expert perspectives on law, technology, and justice.</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="blog-grid" id="blog-posts">
+            <!-- Posts loaded from API -->
+            <div class="empty-state">Loading latest insights...</div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <!-- Same as index.html -->
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2026 Oscar Legal Practitioners.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        async function loadBlog() {
+            try {
+                const response = await fetch('/api/v1/blog/');
+                if (response.ok) {
+                    const posts = await response.json();
+                    const container = document.getElementById('blog-posts');
+                    if (posts.length === 0) {
+                        container.innerHTML = '<p class="empty-state">Check back soon for our first legal insight!</p>';
+                    } else {
+                        container.innerHTML = posts.map(p => `
+                            <article class="blog-card">
+                                <div class="blog-img"><i class="fas fa-book-open-reader"></i></div>
+                                <div class="blog-content">
+                                    <span class="meta">${new Date(p.created_at).toLocaleDateString()} | Global Law</span>
+                                    <h3>${p.title}</h3>
+                                    <p>${p.excerpt || p.content.substring(0, 100) + '...'}</p>
+                                    <a href="#" class="btn btn-outline btn-small">Read Full Article</a>
+                                </div>
+                            </article>
+                        `).join('');
+                    }
+                }
+            } catch (err) { console.error(err); }
+        }
+        loadBlog();
+    </script>
+</body>
+
+</html>

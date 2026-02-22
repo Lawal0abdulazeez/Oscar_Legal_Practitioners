@@ -9,13 +9,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Poetry
-RUN pip install poetry
+RUN pip install poetry poetry-plugin-export
 
 # Copy dependency files
 COPY pyproject.toml poetry.lock* ./
 
 # Ensure lock file exists and export to requirements.txt
-RUN poetry lock --no-update && poetry export -f requirements.txt --output requirements.txt --without-hashes
+RUN poetry lock && poetry export -f requirements.txt --output requirements.txt --without-hashes
 
 # Stage 2: Runtime
 FROM python:3.11-slim as runtime
